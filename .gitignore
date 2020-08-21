@@ -1,0 +1,41 @@
+# Idea
+.idea
+*.iml
+*.iws
+/out/
+.idea_modules/
+
+# Eclipse
+.project
+.settings
+.eclipse
+.classpath
+.springBeans
+
+# Common
+/logs/
+*/logs/
+/log/
+*/log/
+**/target/
+/nexus-packager/target/
+.DS_Store
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+### VS Code ###
+.vscode/
