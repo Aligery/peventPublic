@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ru.aid.pevent.mybatis.mapper.EventsMapper">
+
+    <resultMap id="BaseEvent" type="ru.aid.pevent.model.entity.event.Event"/>
+
+
+    <select id="getRandomNewEventByTypeId" resultMap="BaseEvent">
+        select e.event_id as event_id,
+               e.event_type_id as event_type_id,
+               e.event_name as event_name,
+               e.description as description,
+               e.url as url,
+               e.subway as subway
+          from events e
+        where e.event_type_id = #{typeId, jdbcType=INTEGER}
+          and not exists (select 1
+                        from user_event_views uew
+                            join users u on u.user_id = uew.user_id
+                           where uew.event_id = e.event_id
+                             and u.telegram_user_id = #{telegramUserId, jdbcType=INTEGER})
+        limit 1;
+
+
+    </select>
+
+    <!--<select>&#45;&#45;    select-->
+<!--&#45;&#45;    e.event_id,-->
+<!--&#45;&#45;    e.event_type_id,-->
+<!--&#45;&#45;    e.event_name,-->
+<!--&#45;&#45;    e.description,-->
+<!--&#45;&#45;    e.url-->
+<!--&#45;&#45;     from events e-->
+<!--&#45;&#45; where e.event_type_id = #{typeId, jdbcType=INTEGER}-->
+<!--&#45;&#45; and not exists (-->
+<!--&#45;&#45; select 1 from user_event_views uew join users u on u.user_id = uew.user_id where uew.event_id = e.event_id and u.telegram_user_id = #{telegramUserId, jdbcType=INTEGER}-->
+<!--&#45;&#45; ) limit 1</select>>-->
+
+    <insert id="insertViewed">
+        insert into user_event_views(event_id, user_id, viewed_at, is_sent_to_chat, is_deleted, updated_at)
+        values (
+        #{eventId, jdbcType=INTEGER},
+        (select user_id from users where telegram_user_id = #{userId}),
+        NOW(),
+        false,
+        false,
+        NOW());
+--         ON CONFLICT(event_id, user_id) DO UPDATE SET viewed_at = NOW(), updated_at = NOW()
+    </insert>
+
+    <select id="getLastEventByUserForSendToChat" resultMap="BaseEvent">
+
+      update user_event_views set is_sent_to_chat = true
+
+      FROM (
+        select
+               events.event_id as event_id,
+               event_type_id,
+               event_name,
+               url,
+               description,
+               user_event_id,
+               subway
+        from events
+        left join user_event_views uev on events.event_id = uev.event_id
+        where user_id=(select user_id from users where telegram_user_id = #{userId, jdbcType=INTEGER}) order by viewed_at desc limit 1)  result
+
+      where user_event_views.user_event_id = result.user_event_id
+      RETURNING
+      result.event_id, result.event_type_id, result.event_name, result.description, result.url, result.subway
+
+    </select>
+
+</mapper>

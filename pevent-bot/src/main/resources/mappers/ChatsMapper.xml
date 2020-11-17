@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ru.aid.pevent.mybatis.mapper.ChatsMapper">
+
+    <resultMap id="BaseChat" type="ru.aid.pevent.model.entity.chat.ChatPevent"/>
+
+    <insert id="insertNewChat">
+      insert into chats(telegram_chat_id, chat_name, is_deleted, updated_at)
+      values (#{obj.telegramChatId}, #{obj.chatName}, false, NOW())
+      ON CONFLICT(telegram_chat_id) DO UPDATE SET updated_at = NOW(), is_deleted = false;
+    </insert>
+
+    <insert id="insertChatUserSequence">
+        insert into chat_users(chat_id, user_id, is_leader, is_deleted, updated_at)
+        values ((select chat_id from chats where telegram_chat_id = #{obj.telegramChatId}),
+                (select user_id from users where telegram_user_id = #{obj.telegramUserId}),
+                 #{obj.isLeader},
+                 #{obj.isDeleted},
+                 NOW())
+    </insert>
+
+    <delete id="deleteChat">
+        delete from chats where telegram_chat_id = #{telegramChatId}
+    </delete>
+
+    <delete id="deleteChatUsersSequence">
+        delete from chat_users where chat_id in (select chat_id from chats where telegram_chat_id = #{telegramChatId})
+    </delete>
+
+
+    <select id="getChatsByTelegramUserId" resultMap="BaseChat">
+        select chats.chat_id, chats.telegram_chat_id, chats.chat_name, chats.is_deleted from chats
+        left join chat_users cu on chats.chat_id = cu.chat_id
+        left join users u on cu.user_id = u.user_id
+        where u.telegram_user_id = #{telegramUserId};
+    </select>
+
+</mapper>

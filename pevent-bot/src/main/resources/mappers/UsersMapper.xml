@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ru.aid.pevent.mybatis.mapper.UsersMapper">
+
+    <insert id="insertNewUser">
+        insert into users(telegram_user_id, first_name, last_name, is_deleted, updated_at)
+        values (#{obj.telegramUserId},
+                #{obj.firstName},
+                #{obj.lastName},
+                #{obj.isDeleted},
+                NOW())
+        ON CONFLICT(telegram_user_id) DO UPDATE SET updated_at = NOW();
+    </insert>
+
+
+</mapper>

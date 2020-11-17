@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ru.aid.pevent.mapper.AggregateMapper">
+
+
+    <insert id="insertAggregatedEvent">
+        insert into events(event_type_id,
+                   ext_ident,
+                   planned_at,
+                   event_name,
+                   description,
+                   url,
+                   is_deleted,
+                   updated_at,
+                   subway)
+        values
+        <foreach collection="events" separator="," item="item">
+        (#{item.eventTypeId},
+         #{item.extIdent},
+         NOW(),
+         #{item.eventName},
+         #{item.description},
+         #{item.url},
+         #{item.isDeleted},
+         NOW(),
+         #{item.subway})
+        </foreach>
+        ON CONFLICT(ext_ident) DO UPDATE SET
+         event_type_id=EXCLUDED.event_type_id,
+         event_name=EXCLUDED.event_name,
+         description=EXCLUDED.description,
+         url=EXCLUDED.url,
+         subway=EXCLUDED.subway,
+         updated_at = NOW();
+    </insert>
+
+
+</mapper>

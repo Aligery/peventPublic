@@ -10,26 +10,25 @@
     <version>1.0-SNAPSHOT</version>
 
     <profiles>
+
         <profile>
-            <id>local-db-main</id>
+            <id>lepa-db-main</id>
             <properties>
-                <liquibase.url>jdbc:postgresql://localhost:5432/PeventBot</liquibase.url>
+                <liquibase.url>jdbc:postgresql://localhost:5432/pevent</liquibase.url>
                 <liquibase.username>postgres</liquibase.username>
-                <liquibase.password>root</liquibase.password>
+                <liquibase.password></liquibase.password>
             </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
     </profiles>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.2.4</version>
-            <scope>provided</scope>
+            <version>42.2.15</version>
         </dependency>
+
     </dependencies>
 
     <build>
